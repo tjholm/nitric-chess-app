@@ -6,7 +6,7 @@ interface ChessBoardProps {
   state?: any;
 }
 
-const baseUrl = process.env.API_BASE_URL;
+
 
 declare global {
   namespace JSX {
@@ -17,6 +17,7 @@ declare global {
 }
 
 export async function getServerSideProps({ params }) {
+  const baseUrl = process.env.API_BASE_URL;
   const { game } = params;
 
   // get current game state

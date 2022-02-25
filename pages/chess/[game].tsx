@@ -83,7 +83,7 @@ const ChessBoard: NextPage<ChessBoardProps> = ({ state }) => {
       draggable-pieces
     ></chess-board>
   ) : (
-    <div>"Thanks for making your move"</div>
+    <div>Thanks for making your move</div>
   );
 };
 

@@ -8,14 +8,20 @@ interface ChessBoardProps {
 
 const baseUrl = process.env.API_BASE_URL;
 
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      "chess-board": any;
+    }
+  }
+}
+
 export async function getServerSideProps({ params }) {
   const { game } = params;
 
   // get current game state
   // get legal moves
-  const response = await fetch(
-    `${baseUrl}/game/${game}`
-  );
+  const response = await fetch(`${baseUrl}/game/${game}`);
 
   const state = await response.json();
 
@@ -30,7 +36,7 @@ export async function getServerSideProps({ params }) {
 const ChessBoard: NextPage<ChessBoardProps> = ({ state }) => {
   const { query } = useRouter();
   const { game } = query;
-  const [ moved, setMoved ] = useState(false);
+  const [moved, setMoved] = useState(false);
   const board = useRef(null);
 
   useEffect(() => {
@@ -51,7 +57,7 @@ const ChessBoard: NextPage<ChessBoardProps> = ({ state }) => {
         // send move update to the server
         await fetch("/api/submit", {
           method: "POST",
-          body: JSON.stringify({ game: game, from: source, to: target })
+          body: JSON.stringify({ game: game, from: source, to: target }),
         });
         setMoved(true);
       }
@@ -76,7 +82,9 @@ const ChessBoard: NextPage<ChessBoardProps> = ({ state }) => {
       position={state.fen}
       draggable-pieces
     ></chess-board>
-  ): (<div>"Thanks for making your move"</div>);
+  ) : (
+    <div>"Thanks for making your move"</div>
+  );
 };
 
 export default ChessBoard;

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
-import { NextPage } from "next";
+import { GetServerSidePropsContext, NextPage } from "next";
 
 interface ChessBoardProps {
   state?: any;
@@ -16,7 +16,7 @@ declare global {
   }
 }
 
-export async function getServerSideProps({ params }) {
+export async function getServerSideProps({ params }: GetServerSidePropsContext) {
   const baseUrl = process.env.API_BASE_URL;
   const { game } = params;
 
@@ -36,8 +36,9 @@ export async function getServerSideProps({ params }) {
 
 const ChessBoard: NextPage<ChessBoardProps> = ({ state }) => {
   const { query } = useRouter();
-  const { game } = query;
+  const { game, token } = query;
   const [moved, setMoved] = useState(false);
+  const [error, setError] = useState(undefined);
   const board = useRef(null);
 
   useEffect(() => {
@@ -56,11 +57,17 @@ const ChessBoard: NextPage<ChessBoardProps> = ({ state }) => {
         setAction("snapback");
       } else {
         // send move update to the server
-        await fetch("/api/submit", {
+        const resp = await fetch("/api/submit", {
           method: "POST",
-          body: JSON.stringify({ game: game, from: source, to: target }),
+          body: JSON.stringify({ game: game, token, from: source, to: target }),
         });
-        setMoved(true);
+        if (resp.status === 200) {
+          setMoved(true);
+        } else {
+          console.error(await resp.json())
+          setError("could not make move, your token may be invalid!");
+          board.current.setPosition(state.fen)
+        }
       }
     });
 
@@ -79,6 +86,11 @@ const ChessBoard: NextPage<ChessBoardProps> = ({ state }) => {
 
   return !moved ? (
       <div style={{ height: '100vh', margin: 'auto', maxWidth: 800 }}>
+        {
+          error 
+          ? <span>{error}</span>
+          : null
+        }
         <chess-board
           ref={board}
           position={state.fen}

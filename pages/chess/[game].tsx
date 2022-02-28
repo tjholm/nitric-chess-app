@@ -78,11 +78,13 @@ const ChessBoard: NextPage<ChessBoardProps> = ({ state }) => {
   }, [board]);
 
   return !moved ? (
-    <chess-board
-      ref={board}
-      position={state.fen}
-      draggable-pieces
-    ></chess-board>
+      <div style={{ height: '100vh', margin: 'auto', maxWidth: 800 }}>
+        <chess-board
+          ref={board}
+          position={state.fen}
+          draggable-pieces
+        ></chess-board>
+      </div>
   ) : (
     <div>Thanks for making your move</div>
   );
